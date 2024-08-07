@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import useLogin from "../hooks/useLogin";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
   const { loading, login } = useLogin();
 
@@ -39,13 +41,26 @@ const Login = () => {
             <label className="label p-2">
               <span className="text-base label-text">Password</span>
             </label>
-            <input
-              type="password"
-              placeholder="Enter password"
-              className="w-full input input-bordered h-10"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"} // Toggle password visibility
+                placeholder="Enter password"
+                className="w-full input input-bordered h-10"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={() => setShowPassword(!showPassword)} // Toggle the showPassword state
+              >
+                {showPassword ? (
+                  <AiOutlineEyeInvisible className="h-5 w-5 text-gray-500" />
+                ) : (
+                  <AiOutlineEye className="h-5 w-5 text-gray-500" />
+                )}
+              </button>
+            </div>
           </div>
 
           <Link
@@ -56,7 +71,7 @@ const Login = () => {
           </Link>
 
           <div>
-            <button className="btn btn-block btn-sm mt-2 " disabled={loading}>
+            <button className="btn btn-block btn-sm mt-2" disabled={loading}>
               {loading ? <span className="loading loading-spinner" /> : "Login"}
             </button>
           </div>
