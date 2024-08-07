@@ -11,12 +11,12 @@ const Messages = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      lastMessageRef.current?.scrollIntoView({ behaviour: "smooth" });
+      lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 100);
   }, [messages]);
 
   return (
-    <div className="px-4 flex-1 overflow-auto">
+    <div className="scrollbar scrollbar-thumb-gray-500 scrollbar-track-gray-700  px-4 flex-1 overflow-auto ">
       {!loading &&
         messages.length > 0 &&
         messages.map((message, idx) => (
