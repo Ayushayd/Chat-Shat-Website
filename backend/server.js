@@ -42,40 +42,55 @@ import { app, server } from "./socket/socket.js";
 
 dotenv.config();
 
-// const app = express();
 const PORT = process.env.PORT || 5000;
-
 const __dirname = path.resolve();
 
+const app = express();
+
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "https://avatar.iran.liara.run"], // Add other domains as needed
+      },
+    },
+  })
+);
 app.use(cors());
 
 // Rate limiter to limit repeated requests to public APIs
 const limiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 10 minutes)
 });
 app.use(limiter);
 
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/user", userRoutes);
 
-app.use(express.static(path.join(__dirname, "/frontend/dist")));
+// Serve static files
+app.use(express.static(path.join(__dirname, "frontend", "dist")));
 
+// Catch-all route to serve the frontend
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "frotend", "dist", "index.html"));
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
+  console.error(err.stack);
   res.status(500).json({
     error: "Internal Server Error",
   });
 });
 
+// Connect to MongoDB and start server
 connectMongoDB()
   .then(() => {
     server.listen(PORT, () => {
