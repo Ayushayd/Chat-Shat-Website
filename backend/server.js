@@ -25,6 +25,7 @@
 //   console.log(`Server is running on port ${PORT}`);
 // });
 
+import path from "path";
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
@@ -44,6 +45,8 @@ dotenv.config();
 // const app = express();
 const PORT = process.env.PORT || 5000;
 
+const __dirname = path.resolve();
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(helmet());
@@ -60,9 +63,14 @@ app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/user", userRoutes);
 
+app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frotend", "dist", "index.html"));
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
   res.status(500).json({
     error: "Internal Server Error",
   });
